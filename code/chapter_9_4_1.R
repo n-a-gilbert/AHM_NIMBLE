@@ -83,7 +83,7 @@ constants <- list(nsites = dim(data$y)[1],
                   neigh  = length(data$adj))
 
 # code is slightly modified from book, mostly just prior choices
-# note, I think the beta0 intercept has to be dropped for this model to converge
+# note, I wonder if beta0 should be dropped for this thing to converge?
 car_nmix <- nimble::nimbleCode({
   
   # Priors
@@ -97,7 +97,8 @@ car_nmix <- nimble::nimbleCode({
   }
   
   # CAR prior for spatial random effects
-  eta[1:nsites] ~ dcar_normal(adj[1:neigh], weights[1:neigh], num[1:nsites], tau)
+  # adding zero_mean = 1 improves mixing :)
+  eta[1:nsites] ~ dcar_normal(adj[1:neigh], weights[1:neigh], num[1:nsites], tau, zero_mean = 1)
   
   tau ~ dexp(1)
   
@@ -140,10 +141,10 @@ inits <- function(){
 keepers <- c("beta0", "beta", "alpha0", "alpha", "Ntotal", "tau")
 
 # MCMC settings
-# With these settings, it ran for ~ 1.5 hours (parallelized)
+# With these settings, it ran for ~ 1 hours (parallelized)
 nc <- 3
-ni <- 50000
-nb <- 40000
+ni <- 30000
+nb <- 20000
 nt <- 2  
 
 # code to run chains in parallel
@@ -196,10 +197,10 @@ end - start
 
 # Use the excellent MCMCvis package to summarise/visualize results
 # Looking fairly good except for the abundance intercept,
-# which is nowhere near convergence and the posterior distribution is also way off
+# which is not quite converged and moreover pretty far from truth
 # similar problem is noted in the text (and authors used much longer chains)
 # Possible solution might be to simply drop the intercept and allow the 
-# spatial random effect to act as the intercept 
+# spatial random effect to act as the intercept?
 MCMCvis::MCMCsummary(out)
 
 # traceplots
