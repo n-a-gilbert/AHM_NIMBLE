@@ -60,7 +60,6 @@ str(y2)
 
 table(nvisits <- apply(y2, c(1, 3), function(x) sum(!is.na(x))))
 
-)
 zobs <- apply(y2, c(1, 3), function(x) max(x, na.rm = TRUE))
 n_na <- length(zobs[zobs == "-Inf"])
 zobs[zobs == "-Inf"] <- rbinom(n_na, 1, 0.5)
@@ -135,7 +134,7 @@ nc <- 3
 # 
 # m$initializeInfo()
 
-# ART 1.4 minus
+# ART 1.4 mins
 start <- Sys.time()
 cl <- parallel::makeCluster(nc)
 
